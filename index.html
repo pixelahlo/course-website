@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to create web-systems with AI | Olha L.</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #fafaf8;
+    --bg-card: #ffffff;
+    --bg-code: #1e1e2e;
+    --text: #1a1a1a;
+    --text-secondary: #555;
+    --text-muted: #888;
+    --accent: #2d6a4f;
+    --accent-light: #d8f3dc;
+    --accent-hover: #1b4332;
+    --border: #e0ddd5;
+    --border-light: #eee9df;
+    --code-text: #cdd6f4;
+    --code-keyword: #89b4fa;
+    --code-string: #a6e3a1;
+    --code-comment: #6c7086;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+    --radius: 6px;
+    --font-body: 'Source Serif 4', Georgia, serif;
+    --font-ui: 'Inter', -apple-system, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: var(--accent);
+    z-index: 200;
+    transition: width 0.1s linear;
+    width: 0%;
+  }
+
+  /* ===== HEADER ===== */
+  .site-header {
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+    background: rgba(250,250,248,0.88);
+  }
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .header-title {
+    font-family: var(--font-ui);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  .header-author {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  /* ===== LANGUAGE TOGGLE ===== */
+  .lang-toggle {
+    display: flex;
+    background: #f0ede5;
+    border-radius: 20px;
+    padding: 3px;
+    gap: 2px;
+    font-family: var(--font-ui);
+    flex-shrink: 0;
+  }
+  .lang-btn {
+    padding: 6px 16px;
+    border: none;
+    background: transparent;
+    border-radius: 18px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    font-family: var(--font-ui);
+  }
+  .lang-btn.active {
+    background: var(--bg-card);
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .lang-btn:hover:not(.active) { color: var(--text); }
+
+  /* ===== HERO ===== */
+  .hero {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 64px 24px 48px;
+  }
+  .hero h1 {
+    font-family: var(--font-body);
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .hero .subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+    max-width: 620px;
+    line-height: 1.6;
+  }
+  .hero .disclaimer {
+    margin-top: 20px;
+    padding: 14px 18px;
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 15px;
+    color: var(--accent-hover);
+  }
+
+  /* ===== HERO WORKFLOW VISUAL ===== */
+  .hero-visual {
+    margin-top: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    padding: 28px 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+  .hv-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+  }
+  .hv-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .hv-icon.cursor-icon { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+  .hv-icon.claude-icon { background: linear-gradient(135deg, #d4a574, #c4956a); }
+  .hv-icon.github-icon { background: linear-gradient(135deg, #24292e, #40464d); }
+  .hv-icon.server-icon { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); }
+  .hv-label {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  .hv-arrow {
+    color: var(--border);
+    font-size: 24px;
+    margin: 0 4px;
+    padding-bottom: 22px;
+  }
+
+  /* ===== TABLE OF CONTENTS ===== */
+  .toc {
+    max-width: 900px;
+    margin: 0 auto 40px;
+    padding: 0 24px;
+  }
+  .toc-inner {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    box-shadow: var(--shadow-sm);
+  }
+  .toc-title {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .toc-list {
+    list-style: none;
+    columns: 2;
+    column-gap: 32px;
+  }
+  @media (max-width: 640px) { .toc-list { columns: 1; } }
+  .toc-list li { padding: 5px 0; break-inside: avoid; }
+  .toc-list a {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.15s;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .toc-list a:hover { color: var(--accent); }
+  .toc-list .toc-num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    min-width: 24px;
+  }
+  .toc-list .toc-icon {
+    font-size: 14px;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  /* ===== MAIN CONTENT ===== */
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ===== SECTIONS ===== */
+  .section {
+    margin-bottom: 56px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .section-icon {
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-light);
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .section-num {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .section h2 {
+    font-family: var(--font-body);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  .section h3 {
+    font-family: var(--font-ui);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 28px 0 12px;
+  }
+  .section p { margin-bottom: 14px; color: var(--text); }
+
+  /* ===== TOOL CARDS ===== */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin: 20px 0;
+  }
+  .tool-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .tool-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .tool-card .tool-icon { font-size: 24px; margin-bottom: 8px; }
+  .tool-card .tool-name {
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+  .tool-card .tool-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* ===== CODE BLOCKS ===== */
+  .code-block {
+    background: var(--bg-code);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin: 16px 0;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--code-text);
+    position: relative;
+  }
+  .code-block .code-label {
+    position: absolute;
+    top: 8px;
+    right: 48px;
+    font-size: 11px;
+    color: var(--code-comment);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .code-copy {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--code-comment);
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .code-copy:hover { background: rgba(255,255,255,0.15); color: var(--code-text); }
+  .code-copy.copied { color: var(--code-string); border-color: var(--code-string); }
+  .code-kw { color: var(--code-keyword); }
+  .code-str { color: var(--code-string); }
+  .code-cm { color: var(--code-comment); }
+
+  /* ===== INLINE CODE ===== */
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    background: #f0ede5;
+    padding: 2px 7px;
+    border-radius: 4px;
+    color: var(--accent-hover);
+  }
+
+  /* ===== LISTS ===== */
+  .content ul, .content ol { margin: 12px 0 16px 24px; }
+  .content li { margin-bottom: 8px; padding-left: 4px; }
+  .content li::marker { color: var(--accent); }
+
+  /* ===== INFO BOXES ===== */
+  .info-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 18px 22px;
+    margin: 20px 0;
+    box-shadow: var(--shadow-sm);
+  }
+  .info-box.warning {
+    border-left-color: #e07c24;
+    background: #fdf8f0;
+  }
+
+  /* ===== SKILL CARDS ===== */
+  .skill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+    margin: 20px 0;
+  }
+  .skill-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .skill-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .skill-card .skill-name {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .skill-card .skill-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+
+  /* ===== FLOW DIAGRAM ===== */
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0;
+    padding: 18px 22px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow-x: auto;
+    flex-wrap: wrap;
+  }
+  .flow-step {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 8px 14px;
+    background: var(--accent-light);
+    border-radius: 4px;
+    color: var(--accent-hover);
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  .flow-arrow { color: var(--text-muted); font-size: 18px; flex-shrink: 0; }
+
+  /* ===== TREE ===== */
+  .tree {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    background: var(--bg-code);
+    color: var(--code-text);
+    padding: 18px 22px;
+    border-radius: var(--radius);
+    margin: 16px 0;
+    line-height: 1.8;
+  }
+  .tree .tree-folder { color: var(--code-keyword); }
+  .tree .tree-file { color: var(--code-string); }
+
+  /* ===== LINKS LIST ===== */
+  .links-list { list-style: none; margin: 16px 0; }
+  .links-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .links-list li:last-child { border-bottom: none; }
+  .links-list a {
+    color: var(--accent);
+    text-decoration: none;
+    font-family: var(--font-ui);
+    font-size: 15px;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+  .links-list a:hover { text-decoration: underline; color: var(--accent-hover); }
+  .links-list .link-desc { font-size: 14px; color: var(--text-muted); }
+  .links-list .link-icon { font-size: 16px; flex-shrink: 0; }
+
+  /* ===== STATUS BAR MOCKUP ===== */
+  .status-mockup {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: #1e1e2e;
+    color: #a6adc8;
+    padding: 10px 18px;
+    border-radius: var(--radius);
+    margin: 16px 0;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .status-green { color: #a6e3a1; }
+  .status-yellow { color: #f9e2af; }
+  .status-blue { color: #89b4fa; }
+
+  /* ===== BACK TO TOP BUTTON ===== */
+  .back-to-top {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    width: 44px;
+    height: 44px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(45,106,79,0.35);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.3s, transform 0.3s, background 0.2s;
+    z-index: 90;
+    pointer-events: none;
+  }
+  .back-to-top.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+  .back-to-top:hover { background: var(--accent-hover); }
+
+  /* ===== ACTIVE TOC HIGHLIGHT ===== */
+  .toc-list a.active-link {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 28px; }
+    .section h2 { font-size: 22px; }
+    .header-inner { padding: 12px 16px; }
+    .hero { padding: 40px 16px 32px; }
+    .content { padding: 0 16px 60px; }
+    .toc { padding: 0 16px; }
+    .tool-grid { grid-template-columns: 1fr; }
+    .flow-diagram { flex-direction: column; align-items: flex-start; }
+    .flow-arrow { transform: rotate(90deg); }
+    .hv-arrow { transform: rotate(90deg); }
+    .hero-visual { flex-direction: column; gap: 4px; }
+    .hv-node { padding: 8px 16px; }
+    .back-to-top { bottom: 16px; right: 16px; width: 40px; height: 40px; }
+  }
+
+  [id] { scroll-margin-top: 70px; }
+
+  /* ===== FOOTER ===== */
+  .site-footer {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div>
+      <div class="header-title" data-ua="Як будувати веб-системи з Claude Code" data-en="How to Create Web-Systems with AI">Як будувати веб-системи з Claude Code</div>
+      <div class="header-author">by Olha L.</div>
+    </div>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('ua')">UA</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>
+    <span data-ua="Як будувати веб&#8209;системи з&nbsp;Claude Code" data-en="How to Build Web&#8209;Systems with&nbsp;AI">Як будувати веб&#8209;системи з&nbsp;Claude Code</span>
+  </h1>
+  <p class="subtitle" data-ua="Персональний підхід до розробки веб-систем з допомогою AI. Це не офіційна інструкція — це досвід який склався в процесі роботи." data-en="A personal approach to building web-systems with AI. This is not an official guide — it's a workflow that evolved through practice.">Персональний підхід до розробки веб-систем з допомогою AI. Це не офіційна інструкція — це досвід який склався в процесі роботи.</p>
+  <div class="disclaimer" data-ua="Якщо щось незрозуміло — завжди можна обговорити зі мною або в чаті." data-en="If something is unclear — feel free to discuss with me or in the chat.">Якщо щось незрозуміло — завжди можна обговорити зі мною або в чаті.</div>
+
+  <!-- WORKFLOW VISUAL -->
+  <div class="hero-visual">
+    <div class="hv-node">
+      <div class="hv-icon cursor-icon">C</div>
+      <div class="hv-label">Cursor</div>
+    </div>
+    <div class="hv-arrow">&rarr;</div>
+    <div class="hv-node">
+      <div class="hv-icon claude-icon">AI</div>
+      <div class="hv-label">Claude Code</div>
+    </div>
+    <div class="hv-arrow">&rarr;</div>
+    <div class="hv-node">
+      <div class="hv-icon github-icon">G</div>
+      <div class="hv-label">GitHub</div>
+    </div>
+    <div class="hv-arrow">&rarr;</div>
+    <div class="hv-node">
+      <div class="hv-icon server-icon">S</div>
+      <div class="hv-label" data-ua="Сервер" data-en="Server">Сервер</div>
+    </div>
+  </div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<nav class="toc">
+  <div class="toc-inner">
+    <div class="toc-title" data-ua="Зміст" data-en="Contents">Зміст</div>
+    <ol class="toc-list">
+      <li><a href="#tools"><span class="toc-icon">&#9881;</span><span class="toc-num">01</span> <span data-ua="Інструменти" data-en="Tools">Інструменти</span></a></li>
+      <li><a href="#workflow"><span class="toc-icon">&#128196;</span><span class="toc-num">02</span> <span data-ua="Як організована робота" data-en="How Work is Organized">Як організована робота</span></a></li>
+      <li><a href="#skills"><span class="toc-icon">&#9889;</span><span class="toc-num">03</span> <span data-ua="Скіли" data-en="Skills">Скіли</span></a></li>
+      <li><a href="#install-skills"><span class="toc-icon">&#128230;</span><span class="toc-num">04</span> <span data-ua="Як встановити скіли" data-en="How to Install Skills">Як встановити скіли</span></a></li>
+      <li><a href="#local-testing-section"><span class="toc-icon">&#128187;</span><span class="toc-num">05</span> <span data-ua="Локальне тестування" data-en="Local Testing">Локальне тестування</span></a></li>
+      <li><a href="#github"><span class="toc-icon">&#128193;</span><span class="toc-num">06</span> <span data-ua="GitHub — налаштування" data-en="GitHub — Setup">GitHub — налаштування</span></a></li>
+      <li><a href="#server"><span class="toc-icon">&#128421;</span><span class="toc-num">07</span> <span data-ua="Сервер" data-en="Server">Сервер</span></a></li>
+      <li><a href="#autodeploy"><span class="toc-icon">&#128640;</span><span class="toc-num">08</span> <span data-ua="Автодеплой" data-en="Auto-Deploy">Автодеплой</span></a></li>
+      <li><a href="#daily"><span class="toc-icon">&#9728;</span><span class="toc-num">09</span> <span data-ua="Щоденна робота" data-en="Daily Workflow">Щоденна робота</span></a></li>
+      <li><a href="#team"><span class="toc-icon">&#128101;</span><span class="toc-num">10</span> <span data-ua="Командна робота" data-en="Team Collaboration">Командна робота</span></a></li>
+      <li><a href="#database"><span class="toc-icon">&#128451;</span><span class="toc-num">11</span> <span data-ua="База даних" data-en="Database">База даних</span></a></li>
+      <li><a href="#tasks"><span class="toc-icon">&#128221;</span><span class="toc-num">12</span> <span data-ua="TASKS.md — контекст між сесіями" data-en="TASKS.md — Context Between Sessions">TASKS.md — контекст між сесіями</span></a></li>
+      <li><a href="#compact"><span class="toc-icon">&#128260;</span><span class="toc-num">13</span> <span data-ua="/compact і /clear" data-en="/compact & /clear">/compact і /clear</span></a></li>
+      <li><a href="#verify"><span class="toc-icon">&#128269;</span><span class="toc-num">14</span> <span data-ua="Як перевіряти роботу AI" data-en="How to Verify AI Work">Як перевіряти роботу AI</span></a></li>
+      <li><a href="#statusbar"><span class="toc-icon">&#128202;</span><span class="toc-num">15</span> <span data-ua="Status bar" data-en="Status Bar">Status bar</span></a></li>
+      <li><a href="#links"><span class="toc-icon">&#128279;</span><span class="toc-num">16</span> <span data-ua="Корисні посилання" data-en="Useful Links">Корисні посилання</span></a></li>
+    </ol>
+  </div>
+</nav>
+
+<main class="content">
+
+  <!-- 01 TOOLS -->
+  <section class="section" id="tools">
+    <div class="section-header">
+      <span class="section-icon">&#9881;</span>
+      <span class="section-num">01</span>
+      <h2 data-ua="Інструменти які я використовую" data-en="Tools I Use">Інструменти які я використовую</h2>
+    </div>
+    <div class="tool-grid">
+      <div class="tool-card">
+        <div class="tool-icon">&#9998;</div>
+        <div class="tool-name">Cursor</div>
+        <div class="tool-desc" data-ua="cursor.com — редактор коду де видно всі файли і як AI їх змінює в реальному часі" data-en="cursor.com — code editor where you can see all files and AI changes in real time">cursor.com — редактор коду де видно всі файли і як AI їх змінює в реальному часі</div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-icon">&#9729;</div>
+        <div class="tool-name">GitHub</div>
+        <div class="tool-desc" data-ua="github.com — хмарне сховище коду і автодеплой на сервер" data-en="github.com — cloud code storage and auto-deploy to server">github.com — хмарне сховище коду і автодеплой на сервер</div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-icon">&#9654;</div>
+        <div class="tool-name">Claude Code</div>
+        <div class="tool-desc" data-ua="Запускається в терміналі всередині Cursor" data-en="Runs in the terminal inside Cursor">Запускається в терміналі всередині Cursor</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 WORKFLOW -->
+  <section class="section" id="workflow">
+    <div class="section-header">
+      <span class="section-icon">&#128196;</span>
+      <span class="section-num">02</span>
+      <h2 data-ua="Як організована моя робота" data-en="How My Work is Organized">Як організована моя робота</h2>
+    </div>
+    <p data-ua="Перш ніж починати будь-яку розробку — я пишу інструкцію для AI. Це найважливіший крок якому я навчилась. Без чіткої інструкції AI починає вигадувати і робити не те що потрібно." data-en="Before starting any development — I write an instruction for AI. This is the most important step I've learned. Without a clear instruction, AI starts making things up and doing the wrong thing.">Перш ніж починати будь-яку розробку — я пишу інструкцію для AI. Це найважливіший крок якому я навчилась. Без чіткої інструкції AI починає вигадувати і робити не те що потрібно.</p>
+    <p data-ua="Інструкція зберігається у файлі CLAUDE.md прямо в папці проекту. Там я описую:" data-en="The instruction is stored in a CLAUDE.md file right in the project folder. There I describe:">Інструкція зберігається у файлі <code>CLAUDE.md</code> прямо в папці проекту. Там я описую:</p>
+    <ul>
+      <li data-ua="що це за система і для чого" data-en="what the system is and its purpose">що це за система і для чого</li>
+      <li data-ua="який стек технологій" data-en="what tech stack to use">який стек технологій</li>
+      <li data-ua="правила безпеки" data-en="security rules">правила безпеки</li>
+      <li data-ua="як AI повинен себе вести (питати перед тим як щось міняти, не вигадувати, показувати план перед кодом)" data-en="how AI should behave (ask before changing anything, don't make things up, show plan before code)">як AI повинен себе вести (питати перед тим як щось міняти, не вигадувати, показувати план перед кодом)</li>
+      <li data-ua="архітектурні рішення які вже прийняті" data-en="architectural decisions already made">архітектурні рішення які вже прийняті</li>
+      <li data-ua="структуру бази даних і логіку бізнес-процесів" data-en="database structure and business process logic">структуру бази даних і логіку бізнес-процесів</li>
+    </ul>
+    <div class="info-box">
+      <p data-ua="Цю інструкцію можна скласти разом з Claude в чаті — просто розповідаєш що хочеш побудувати, він задає питання і допомагає оформити все структуровано." data-en="You can compose this instruction together with Claude in chat — just describe what you want to build, it asks questions and helps structure everything.">Цю інструкцію можна скласти разом з Claude в чаті — просто розповідаєш що хочеш побудувати, він задає питання і допомагає оформити все структуровано.</p>
+    </div>
+
+    <h3 data-ua="Як виглядає мій робочий процес" data-en="What My Workflow Looks Like">Як виглядає мій робочий процес</h3>
+    <p data-ua="Я завжди тримаю два вікна відкритими одночасно:" data-en="I always keep two windows open at the same time:">Я завжди тримаю два вікна відкритими одночасно:</p>
+    <ol>
+      <li><strong>Cursor</strong> — <span data-ua="там Claude Code пише і змінює файли, я бачу це в реальному часі" data-en="where Claude Code writes and modifies files, I see this in real time">там Claude Code пише і змінює файли, я бачу це в реальному часі</span></li>
+      <li><strong data-ua="Цей чат" data-en="This chat">Цей чат</strong> — <span data-ua="тут я обговорюю логіку, задаю питання про те що незрозуміло, уточнюю вимоги" data-en="here I discuss logic, ask questions about unclear things, clarify requirements">тут я обговорюю логіку, задаю питання про те що незрозуміло, уточнюю вимоги</span></li>
+    </ol>
+    <p data-ua="Claude Code запускається в терміналі всередині Cursor командою claude. Я пишу йому задачу — він читає файли проекту, пише код, запускає команди. Я бачу кожну дію і можу зупинити якщо щось іде не так." data-en="Claude Code runs in the terminal inside Cursor with the command claude. I write it a task — it reads project files, writes code, runs commands. I see every action and can stop it if something goes wrong.">Claude Code запускається в терміналі всередині Cursor командою <code>claude</code>. Я пишу йому задачу — він читає файли проекту, пише код, запускає команди. Я бачу кожну дію і можу зупинити якщо щось іде не так.</p>
+  </section>
+
+  <!-- 03 SKILLS -->
+  <section class="section" id="skills">
+    <div class="section-header">
+      <span class="section-icon">&#9889;</span>
+      <span class="section-num">03</span>
+      <h2 data-ua="Скіли" data-en="Skills">Скіли</h2>
+    </div>
+    <p data-ua="Окрім базового Claude Code я встановила скіли — це набори інструкцій які перетворюють AI на спеціаліста в конкретній галузі. Кожен скіл це папка з файлом SKILL.md де описано як AI повинен поводитись в певній ситуації." data-en="Besides base Claude Code I installed skills — sets of instructions that turn AI into a specialist in a specific field. Each skill is a folder with a SKILL.md file describing how AI should behave in a given situation.">Окрім базового Claude Code я встановила скіли — це набори інструкцій які перетворюють AI на спеціаліста в конкретній галузі. Кожен скіл це папка з файлом <code>SKILL.md</code> де описано як AI повинен поводитись в певній ситуації.</p>
+
+    <h3 data-ua="Різниця між скілами і агентами" data-en="Difference Between Skills and Agents">Різниця між скілами і агентами</h3>
+    <ul>
+      <li><strong data-ua="Скіл" data-en="Skill">Скіл</strong> — <span data-ua="це інструкція-спеціалізація. AI читає її і починає думати як фахівець у цій галузі. Не потребує окремого запуску." data-en="a specialization instruction. AI reads it and starts thinking like an expert in that field. No separate launch needed.">це інструкція-спеціалізація. AI читає її і починає думати як фахівець у цій галузі. Не потребує окремого запуску.</span></li>
+      <li><strong data-ua="Агент" data-en="Agent">Агент</strong> — <span data-ua="це окремий AI процес з власним контекстом який можна запустити паралельно для конкретної задачі." data-en="a separate AI process with its own context that can be launched in parallel for a specific task.">це окремий AI процес з власним контекстом який можна запустити паралельно для конкретної задачі.</span></li>
+    </ul>
+
+    <h3 data-ua="Скіли які я використовую" data-en="Skills I Use">Скіли які я використовую</h3>
+    <div class="skill-grid">
+      <div class="skill-card">
+        <div class="skill-name">&#128293; grill-me</div>
+        <div class="skill-desc" data-ua="Коли пишу &quot;grill me&quot; перед описом задачі, AI починає задавати жорсткі питання про кожне рішення поки ми не дійдемо до повного розуміння." data-en="When I write &quot;grill me&quot; before a task description, AI starts asking tough questions about every decision until we reach full understanding.">Коли пишу "grill me" перед описом задачі, AI починає задавати жорсткі питання про кожне рішення поки ми не дійдемо до повного розуміння.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-name">&#9989; tdd</div>
+        <div class="skill-desc" data-ua="Test Driven Development. AI спочатку пише тест який перевіряє що код повинен робити, потім пише сам код." data-en="Test Driven Development. AI first writes a test that verifies what code should do, then writes the code itself.">Test Driven Development. AI спочатку пише тест який перевіряє що код повинен робити, потім пише сам код.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-name">&#128737; setup-pre-commit</div>
+        <div class="skill-desc" data-ua="Автоматично перевіряє код перед кожним git push. Якщо є помилки — push не відбудеться." data-en="Automatically checks code before every git push. If there are errors — the push won't happen.">Автоматично перевіряє код перед кожним git push. Якщо є помилки — push не відбудеться.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-name">&#128219; git-guardrails-claude-code</div>
+        <div class="skill-desc" data-ua="Блокує небезпечні git команди. Claude Code не може випадково видалити роботу." data-en="Blocks dangerous git commands. Claude Code can't accidentally delete your work.">Блокує небезпечні git команди. Claude Code не може випадково видалити роботу.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-name">&#127912; frontend-design</div>
+        <div class="skill-desc" data-ua="AI створює красивий сучасний інтерфейс, не шаблонний." data-en="AI creates beautiful modern interfaces, not templated ones.">AI створює красивий сучасний інтерфейс, не шаблонний.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-name">&#128195; web-design-guidelines</div>
+        <div class="skill-desc" data-ua="Правила веб-дизайну для AI." data-en="Web design rules for AI.">Правила веб-дизайну для AI.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 INSTALL SKILLS -->
+  <section class="section" id="install-skills">
+    <div class="section-header">
+      <span class="section-icon">&#128230;</span>
+      <span class="section-num">04</span>
+      <h2 data-ua="Як встановити скіли" data-en="How to Install Skills">Як встановити скіли</h2>
+    </div>
+    <p data-ua="Скіли встановлюються однією командою в терміналі прямо в папці проекту:" data-en="Skills are installed with a single command in the terminal right in the project folder:">Скіли встановлюються однією командою в терміналі прямо в папці проекту:</p>
+    <div class="code-block"><span class="code-label">terminal</span><button class="code-copy" onclick="copyCode(this)">&#9112; Copy</button><span class="code-kw">npx</span> skills@latest <span class="code-str">add</span> mattpocock/skills/grill-me</div>
+
+    <p data-ua="При встановленні запитає:" data-en="During installation it will ask:">При встановленні запитає:</p>
+    <ul>
+      <li data-ua="для яких агентів → вибираєш Claude Code" data-en="for which agents → choose Claude Code">для яких агентів → вибираєш <strong>Claude Code</strong></li>
+      <li>scope → <strong>Project</strong> <span data-ua="(буде в папці проекту і потрапить в git)" data-en="(will be in project folder and go into git)">(буде в папці проекту і потрапить в git)</span></li>
+      <li data-ua="метод → Symlink (рекомендований)" data-en="method → Symlink (recommended)">метод → <strong>Symlink</strong> <span data-ua="(рекомендований)" data-en="(recommended)">(рекомендований)</span></li>
+    </ul>
+    <p data-ua="Після цього колеги які зроблять git pull отримають ці скіли автоматично." data-en="After that, colleagues who do git pull will get these skills automatically.">Після цього колеги які зроблять <code>git pull</code> отримають ці скіли автоматично.</p>
+
+    <h3 data-ua="Варіант 2 — встановити локальний скіл" data-en="Option 2 — Install a Local Skill">Варіант 2 — встановити локальний скіл</h3>
+    <p data-ua="Якщо скіл це папка з файлом SKILL.md — просто кладеш її в проект:" data-en="If a skill is a folder with a SKILL.md file — just place it in the project:">Якщо скіл це папка з файлом <code>SKILL.md</code> — просто кладеш її в проект:</p>
+    <div class="tree"><span class="tree-folder">your-project/</span>
+  &#9492;&#9472;&#9472; <span class="tree-folder">.claude/</span>
+      &#9492;&#9472;&#9472; <span class="tree-folder">skills/</span>
+          &#9492;&#9472;&#9472; <span class="tree-folder">skill-name/</span>
+              &#9492;&#9472;&#9472; <span class="tree-file">SKILL.md</span></div>
+
+    <h3 data-ua="Де шукати скіли" data-en="Where to Find Skills">Де шукати скіли</h3>
+    <p data-ua="Знайти скіли можна на claudemarketplaces.com або github.com. Я вибирала офіційні від Anthropic і перевірені від відомих розробників." data-en="You can find skills at claudemarketplaces.com or github.com. I chose official ones from Anthropic and verified ones from well-known developers.">Знайти скіли можна на <strong>claudemarketplaces.com</strong> або <strong>github.com</strong>. Я вибирала офіційні від Anthropic і перевірені від відомих розробників.</p>
+    <div class="info-box">
+      <p data-ua="Мої скіли і приклад CLAUDE.md лежать в тій же папці на Google Drive:" data-en="My skills and example CLAUDE.md are in the same folder on Google Drive:">Мої скіли і приклад CLAUDE.md лежать в тій же папці на Google Drive:</p>
+      <p><a href="https://drive.google.com/drive/folders/1WV5FZL5Z3njNLpDpoge7TVw_LdjAS3T4?usp=sharing" target="_blank" style="color:var(--accent);font-family:var(--font-ui);font-size:15px;font-weight:500;">&#128194; Google Drive</a></p>
+    </div>
+  </section>
+
+  <!-- 05 LOCAL TESTING -->
+  <section class="section" id="local-testing-section">
+    <div class="section-header">
+      <span class="section-icon">&#128187;</span>
+      <span class="section-num">05</span>
+      <h2 data-ua="Локальне тестування" data-en="Local Testing">Локальне тестування</h2>
+    </div>
+    <p data-ua="Перед тим як відправити код на сервер — я завжди перевіряю локально. На моєму Mac запускається сервер:" data-en="Before sending code to the server — I always test locally. On my Mac a server starts:">Перед тим як відправити код на сервер — я завжди перевіряю локально. На моєму Mac запускається сервер:</p>
+    <div class="code-block"><button class="code-copy" onclick="copyCode(this)">&#9112; Copy</button><span class="code-kw">npm</span> run dev</div>
+    <p data-ua="І відкриваю в браузері http://localhost:5011 — бачу сайт як він виглядає. Ніхто інший цього не бачить, це тільки на моєму комп'ютері." data-en="And I open in the browser http://localhost:5011 — I see how the site looks. Nobody else can see this, it's only on my computer.">І відкриваю в браузері <code>http://localhost:5011</code> — бачу сайт як він виглядає. Ніхто інший цього не бачить, це тільки на моєму комп'ютері.</p>
+    <p data-ua="Якщо все добре — роблю push на GitHub, і через 30 секунд зміни автоматично з'являються на живому сайті." data-en="If everything looks good — I push to GitHub, and within 30 seconds changes automatically appear on the live site.">Якщо все добре — роблю push на GitHub, і через 30 секунд зміни автоматично з'являються на живому сайті.</p>
+  </section>
+
+  <!-- 06 GITHUB -->
+  <section class="section" id="github">
+    <div class="section-header">
+      <span class="section-icon">&#128193;</span>
+      <span class="section-num">06</span>
+      <h2 data-ua="GitHub — налаштування" data-en="GitHub — Setup">GitHub — налаштування</h2>
+    </div>
+    <p data-ua="Реєструєшся на github.com, створюєш приватний репозиторій (сховище проекту)." data-en="Register on github.com, create a private repository (project storage).">Реєструєшся на github.com, створюєш приватний репозиторій (сховище проекту).</p>
+    <p data-ua="Генеруєш Personal Access Token — це як пароль для терміналу:" data-en="Generate a Personal Access Token — it's like a password for the terminal:">Генеруєш <strong>Personal Access Token</strong> — <span data-ua="це як пароль для терміналу:" data-en="it's like a password for the terminal:">це як пароль для терміналу:</span></p>
+    <p data-ua="GitHub → Settings → Developer settings → Personal access tokens → Generate new token (classic) → вибрати repo і workflow → зберегти одразу, більше не покажеться!" data-en="GitHub → Settings → Developer settings → Personal access tokens → Generate new token (classic) → select repo and workflow → save immediately, won't show again!">GitHub → Settings → Developer settings → Personal access tokens → Generate new token (classic) → вибрати repo і workflow → зберегти одразу, більше не покажеться!</p>
+    <p data-ua="Підключаєш локальну папку до GitHub через термінал:" data-en="Connect local folder to GitHub via terminal:">Підключаєш локальну папку до GitHub через термінал:</p>
+    <div class="code-block"><span class="code-label">terminal</span><button class="code-copy" onclick="copyCode(this)">&#9112; Copy</button><span class="code-kw">git</span> remote add origin https://github.com/<span class="code-str">your-login/project-name</span>.git
+<span class="code-kw">git</span> branch -M main
+<span class="code-kw">git</span> push -u origin main</div>
+  </section>
+
+  <!-- 07 SERVER -->
+  <section class="section" id="server">
+    <div class="section-header">
+      <span class="section-icon">&#128421;</span>
+      <span class="section-num">07</span>
+      <h2 data-ua="Сервер" data-en="Server">Сервер</h2>
+    </div>
+    <p data-ua="Отримуєш від хостинг-провайдера дані для підключення:" data-en="You get connection details from your hosting provider:">Отримуєш від хостинг-провайдера дані для підключення:</p>
+    <div class="code-block"><span class="code-label">credentials</span><span class="code-cm">Host:</span>   <span class="code-str">server.example.app</span>
+<span class="code-cm">Login:</span>  <span class="code-str">billing</span>
+<span class="code-cm">Port:</span>   <span class="code-str">42244</span>
+<span class="code-cm">Path:</span>   <span class="code-str">/home/billing/web/site/public_html</span></div>
+
+    <p data-ua="Заходиш на сервер через термінал (не в Cursor — в окремому Terminal):" data-en="Connect to server via terminal (not in Cursor — in a separate Terminal):">Заходиш на сервер через термінал (не в Cursor — в окремому Terminal):</p>
+    <div class="code-block"><button class="code-copy" onclick="copyCode(this)">&#9112; Copy</button><span class="code-kw">ssh</span> -p 42244 billing@server.example.app</div>
+
+    <h3 data-ua="Що потрібно просити у адміна сервера" data-en="What to Ask Your Server Admin">Що потрібно просити у адміна сервера</h3>
+    <p data-ua="Звичайний користувач не має права встановлювати програми на сервері (sudo права). Тому деякі речі потрібно просити у адміна." data-en="A regular user can't install programs on the server (sudo rights). So some things need to be requested from the admin.">Звичайний користувач не має права встановлювати програми на сервері (sudo права). Тому деякі речі потрібно просити у адміна.</p>
+    <p data-ua="Наприклад, якщо потрібна база даних — після того як адмін зробить, отримуєш:" data-en="For example, if you need a database — after the admin sets it up, you get:">Наприклад, якщо потрібна база даних — після того як адмін зробить, отримуєш:</p>
+    <div class="code-block"><span class="code-cm">Host:</span>     <span class="code-str">localhost</span>
+<span class="code-cm">DB:</span>       <span class="code-str">billing_db</span>
+<span class="code-cm">User:</span>     <span class="code-str">billing_user</span>
+<span class="code-cm">Password:</span> <span class="code-str">xxxxxxxxx</span></div>
+
+    <div class="info-box warning">
+      <p data-ua="Ці дані додаєш у .env файл — він ніколи не потрапляє в GitHub. Файл .env з секретами (паролі, API ключі, дані бази даних) автоматично ігнорується через .gitignore." data-en="You add this data to the .env file — it never goes to GitHub. The .env file with secrets (passwords, API keys, database credentials) is automatically ignored via .gitignore.">Ці дані додаєш у <code>.env</code> файл — він ніколи не потрапляє в GitHub. Файл <code>.env</code> з секретами (паролі, API ключі, дані бази даних) автоматично ігнорується через <code>.gitignore</code>.</p>
+    </div>
+  </section>
+
+  <!-- 08 AUTODEPLOY -->
+  <section class="section" id="autodeploy">
+    <div class="section-header">
+      <span class="section-icon">&#128640;</span>
+      <span class="section-num">08</span>
+      <h2 data-ua="Автодеплой" data-en="Auto-Deploy">Автодеплой</h2>
+    </div>
+    <p data-ua="Налаштовується один раз. Після цього кожен git push автоматично оновлює живий сайт:" data-en="Set up once. After that every git push automatically updates the live site:">Налаштовується один раз. Після цього кожен <code>git push</code> автоматично оновлює живий сайт:</p>
+    <div class="flow-diagram">
+      <span class="flow-step">git push</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">GitHub</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">SSH</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">git pull</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step" data-ua="Перезапуск сервера" data-en="Server restart">Перезапуск сервера</span>
+    </div>
+    <p data-ua="Для цього потрібно створити SSH ключ і налаштувати GitHub Actions — файл .github/workflows/deploy.yml. Claude Code допоможе зробити це крок за кроком." data-en="For this you need to create an SSH key and set up GitHub Actions — the file .github/workflows/deploy.yml. Claude Code will help you do this step by step.">Для цього потрібно створити SSH ключ і налаштувати GitHub Actions — файл <code>.github/workflows/deploy.yml</code>. Claude Code допоможе зробити це крок за кроком.</p>
+  </section>
+
+  <!-- 09 DAILY WORKFLOW -->
+  <section class="section" id="daily">
+    <div class="section-header">
+      <span class="section-icon">&#9728;</span>
+      <span class="section-num">09</span>
+      <h2 data-ua="Щоденна робота" data-en="Daily Workflow">Щоденна робота</h2>
+    </div>
+    <h3 data-ua="Початок дня" data-en="Start of Day">Початок дня</h3>
+    <div class="code-block"><button class="code-copy" onclick="copyCode(this)">&#9112; Copy</button><span class="code-kw">git</span> pull   <span class="code-cm"># get latest changes from colleagues</span></div>
+    <p data-ua="Якщо працюєш один, то немає сенсу робити." data-en="If you work alone, no need to do this.">Якщо працюєш один, то немає сенсу робити.</p>
+
+    <h3 data-ua="Кінець дня" data-en="End of Day">Кінець дня</h3>
+    <div class="code-block"><button class="code-copy" onclick="copyCode(this)">&#9112; Copy</button><span class="code-kw">git</span> add .
+<span class="code-kw">git</span> commit -m <span class="code-str">"what I did"</span>
+<span class="code-kw">git</span> push   <span class="code-cm"># to GitHub → auto-deploy to server</span></div>
+  </section>
+
+  <!-- 10 TEAM -->
+  <section class="section" id="team">
+    <div class="section-header">
+      <span class="section-icon">&#128101;</span>
+      <span class="section-num">10</span>
+      <h2 data-ua="Командна робота" data-en="Team Collaboration">Командна робота</h2>
+    </div>
+    <p data-ua="Кожен розробник працює у своїй гілці і не заважає іншим:" data-en="Each developer works in their own branch without interfering with others:">Кожен розробник працює у своїй гілці і не заважає іншим:</p>
+    <div class="code-block"><button class="code-copy" onclick="copyCode(this)">&#9112; Copy</button><span class="code-kw">git</span> checkout -b feature/name      <span class="code-cm"># create your branch</span>
+<span class="code-cm"># write your code...</span>
+<span class="code-kw">git</span> push origin feature/name       <span class="code-cm"># push your branch</span></div>
+    <p data-ua="На GitHub створюється Pull Request — запит злити твою гілку в основну. Інші перевіряють і тільки тоді код потрапляє на продакшн." data-en="On GitHub a Pull Request is created — a request to merge your branch into main. Others review it and only then the code goes to production.">На GitHub створюється <strong>Pull Request</strong> — запит злити твою гілку в основну. Інші перевіряють і тільки тоді код потрапляє на продакшн.</p>
+    <div class="tree"><span class="tree-folder">main</span> <span class="code-cm">(live site)</span>
+&#9500;&#9472;&#9472; <span class="tree-file">feature/anna-duties</span>    <span class="code-cm">&larr; Anna works on her part</span>
+&#9492;&#9472;&#9472; <span class="tree-file">feature/ivan-labels</span>    <span class="code-cm">&larr; Ivan works on his part</span></div>
+  </section>
+
+  <!-- 11 DATABASE -->
+  <section class="section" id="database">
+    <div class="section-header">
+      <span class="section-icon">&#128451;</span>
+      <span class="section-num">11</span>
+      <h2 data-ua="База даних на сервері" data-en="Database on Server">База даних на сервері</h2>
+    </div>
+    <p data-ua="Перший раз після деплою — один раз:" data-en="First time after deploy — run once:">Перший раз після деплою — один раз:</p>
+    <div class="code-block"><button class="code-copy" onclick="copyCode(this)">&#9112; Copy</button><span class="code-kw">npm</span> run migrate    <span class="code-cm"># creates tables</span>
+<span class="code-kw">npm</span> run seed       <span class="code-cm"># initial data (admin, references)</span></div>
+    <p data-ua="Після цього при кожному push база не чіпається — тільки код оновлюється. Нові таблиці — новий файл міграції." data-en="After that, with each push the database isn't touched — only code updates. New tables — a new migration file.">Після цього при кожному push база не чіпається — тільки код оновлюється. Нові таблиці — новий файл міграції.</p>
+  </section>
+
+  <!-- 12 TASKS.MD -->
+  <section class="section" id="tasks">
+    <div class="section-header">
+      <span class="section-icon">&#128221;</span>
+      <span class="section-num">12</span>
+      <h2>TASKS.md — <span data-ua="як не втрачати контекст між сесіями" data-en="keeping context between sessions">як не втрачати контекст між сесіями</span></h2>
+    </div>
+    <p data-ua="Claude Code не пам'ятає попередні сесії. Тільки бачить і читає файли. Файли .md — це його пам'ять та інструкції. Тому я веду ще файл TASKS.md прямо в папці проекту." data-en="Claude Code doesn't remember previous sessions. It only sees and reads files. The .md files are its memory and instructions. So I also maintain a TASKS.md file right in the project folder.">Claude Code не пам'ятає попередні сесії. Тільки бачить і читає файли. Файли <code>.md</code> — це його пам'ять та інструкції. Тому я веду ще файл <code>TASKS.md</code> прямо в папці проекту.</p>
+    <p data-ua="В кінці кожної сесії я прошу Claude оновити цей файл:" data-en="At the end of each session I ask Claude to update this file:">В кінці кожної сесії я прошу Claude оновити цей файл:</p>
+    <ul>
+      <li data-ua="що зробили сьогодні (позначити як виконане)" data-en="what we did today (mark as done)">що зробили сьогодні (позначити як виконане)</li>
+      <li data-ua="що в процесі" data-en="what's in progress">що в процесі</li>
+      <li data-ua="що наступне" data-en="what's next">що наступне</li>
+      <li data-ua="важливі рішення які прийняли" data-en="important decisions made">важливі рішення які прийняли</li>
+    </ul>
+    <div class="info-box">
+      <p data-ua="На початку наступної сесії Claude читає TASKS.md і одразу розуміє де ми зупинились. Не потрібно знову пояснювати контекст." data-en="At the start of the next session Claude reads TASKS.md and immediately understands where we left off. No need to explain context again.">На початку наступної сесії Claude читає <code>TASKS.md</code> і одразу розуміє де ми зупинились. Не потрібно знову пояснювати контекст.</p>
+    </div>
+  </section>
+
+  <!-- 13 COMPACT -->
+  <section class="section" id="compact">
+    <div class="section-header">
+      <span class="section-icon">&#128260;</span>
+      <span class="section-num">13</span>
+      <h2>/compact <span data-ua="і" data-en="&amp;">&amp;</span> /clear</h2>
+    </div>
+    <p data-ua="Під час довгої сесії Claude Code накопичує багато контексту в пам'яті. Коли сесія стає дуже довгою (кілька годин активної роботи) — AI починає &quot;забувати&quot; що було на початку або сповільнюється." data-en="During a long session Claude Code accumulates a lot of context in memory. When the session gets very long (several hours of active work) — AI starts &quot;forgetting&quot; what was at the beginning or slows down.">Під час довгої сесії Claude Code накопичує багато контексту в пам'яті. Коли сесія стає дуже довгою — AI починає "забувати" що було на початку або сповільнюється.</p>
+    <ul>
+      <li><code>/compact</code> — <span data-ua="стискає всю історію сесії до короткого резюме. Звільняє місце в контексті але зберігає суть. Використовую коли сесія іде більше 2-3 годин." data-en="compresses all session history to a short summary. Frees context space but keeps the essence. I use it when a session runs over 2-3 hours.">стискає всю історію сесії до короткого резюме. Звільняє місце в контексті але зберігає суть.</span></li>
+      <li><code>/clear</code> — <span data-ua="повністю очищує контекст і починає з нуля. Використовую коли хочу почати нову незалежну задачу." data-en="completely clears context and starts from zero. I use when I want to start a new independent task.">повністю очищує контекст і починає з нуля.</span></li>
+    </ul>
+    <div class="info-box warning">
+      <p data-ua="Після /compact обов'язково нагадуй AI прочитати CLAUDE.md і TASKS.md щоб він знову мав повний контекст проекту." data-en="After /compact always remind AI to read CLAUDE.md and TASKS.md so it has the full project context again.">Після <code>/compact</code> обов'язково нагадуй AI прочитати <code>CLAUDE.md</code> і <code>TASKS.md</code> щоб він знову мав повний контекст проекту.</p>
+    </div>
+  </section>
+
+  <!-- 14 VERIFY -->
+  <section class="section" id="verify">
+    <div class="section-header">
+      <span class="section-icon">&#128269;</span>
+      <span class="section-num">14</span>
+      <h2 data-ua="Як перевіряти роботу AI" data-en="How to Verify AI Work">Як перевіряти роботу AI</h2>
+    </div>
+    <p data-ua="AI може помилятись — особливо в бізнес-логіці яку він не до кінця розуміє. Що я роблю:" data-en="AI can make mistakes — especially in business logic it doesn't fully understand. What I do:">AI може помилятись — особливо в бізнес-логіці яку він не до кінця розуміє. Що я роблю:</p>
+    <ul>
+      <li data-ua="Прошу показати план перед кодом — так можна зупинити якщо іде не туди" data-en="Ask to show a plan before code — this way I can stop if it's going wrong">Прошу показати план перед кодом — так можна зупинити якщо іде не туди</li>
+      <li data-ua="Перевіряю числа — якщо AI каже &quot;180 рядків оброблено&quot; — відкриваю Excel і рахую сама" data-en="Verify numbers — if AI says &quot;180 rows processed&quot; — I open Excel and count myself">Перевіряю числа — якщо AI каже "180 рядків оброблено" — відкриваю Excel і рахую сама</li>
+      <li data-ua="Тестую на реальних даних — у мене є тестові файли з відомим результатом, порівнюю" data-en="Test on real data — I have test files with known results, I compare">Тестую на реальних даних — у мене є тестові файли з відомим результатом, порівнюю</li>
+      <li data-ua="Читаю що він змінив — Cursor показує diff, я переглядаю перед тим як погодитись" data-en="Read what it changed — Cursor shows the diff, I review before accepting">Читаю що він змінив — Cursor показує diff, я переглядаю перед тим як погодитись</li>
+      <li data-ua="Питаю &quot;чому&quot; — якщо рішення здається дивним, прошу пояснити логіку" data-en="Ask &quot;why&quot; — if a decision seems strange, I ask to explain the logic">Питаю "чому" — якщо рішення здається дивним, прошу пояснити логіку</li>
+    </ul>
+    <div class="info-box warning">
+      <p data-ua="Якщо щось виглядає підозріло — краще зупинитись і уточнити в чаті ніж потім виправляти." data-en="If something looks suspicious — better to stop and clarify in chat than fix it later.">Якщо щось виглядає підозріло — краще зупинитись і уточнити в чаті ніж потім виправляти.</p>
+    </div>
+  </section>
+
+  <!-- 15 STATUS BAR -->
+  <section class="section" id="statusbar">
+    <div class="section-header">
+      <span class="section-icon">&#128202;</span>
+      <span class="section-num">15</span>
+      <h2>Status bar — <span data-ua="зручний моніторинг сесії" data-en="convenient session monitoring">зручний моніторинг сесії</span></h2>
+    </div>
+    <p data-ua="Встановлюю один раз командою:" data-en="Install once with:">Встановлюю один раз командою:</p>
+    <div class="code-block"><button class="code-copy" onclick="copyCode(this)">&#9112; Copy</button><span class="code-kw">npx</span> ccstatusline@latest</div>
+    <p data-ua="Потім прямо в чаті Claude Code прошу: &quot;Add all available data to status line&quot;" data-en="Then in the Claude Code chat I ask: &quot;Add all available data to status line&quot;">Потім прямо в чаті Claude Code прошу: "Add all available data to status line"</p>
+    <div class="status-mockup">
+      <span class="status-item status-blue">billingdesk</span>
+      <span class="status-item">main</span>
+      <span class="status-item">|</span>
+      <span class="status-item">Opus 4.6 (1M context)</span>
+      <span class="status-item">|</span>
+      <span class="status-item status-green">[#&mdash;&mdash;&mdash;] 10%</span>
+      <span class="status-item">|</span>
+      <span class="status-item status-yellow">$9.16</span>
+      <span class="status-item">|</span>
+      <span class="status-item">4776m14s</span>
+    </div>
+    <p data-ua="Показує в реальному часі:" data-en="Shows in real time:">Показує в реальному часі:</p>
+    <ul>
+      <li data-ua="назву проекту і гілку git" data-en="project name and git branch">назву проекту і гілку git</li>
+      <li data-ua="яка модель працює" data-en="which model is working">яка модель працює</li>
+      <li data-ua="скільки контексту використано (зелений <50%, жовтий 50-75%, червоний >75%)" data-en="how much context is used (green <50%, yellow 50-75%, red >75%)">скільки контексту використано (зелений &lt;50%, жовтий 50-75%, червоний &gt;75%)</li>
+      <li data-ua="вартість поточної сесії" data-en="current session cost">вартість поточної сесії</li>
+      <li data-ua="тривалість сесії" data-en="session duration">тривалість сесії</li>
+    </ul>
+    <div class="info-box">
+      <p data-ua="Дуже допомагає розуміти коли час робити /compact і скільки коштує робота." data-en="Very helpful for knowing when to run /compact and how much the work costs.">Дуже допомагає розуміти коли час робити <code>/compact</code> і скільки коштує робота.</p>
+    </div>
+  </section>
+
+  <!-- 16 LINKS -->
+  <section class="section" id="links">
+    <div class="section-header">
+      <span class="section-icon">&#128279;</span>
+      <span class="section-num">16</span>
+      <h2 data-ua="Корисні посилання" data-en="Useful Links">Корисні посилання</h2>
+    </div>
+    <ul class="links-list">
+      <li>
+        <span class="link-icon">&#128214;</span>
+        <a href="https://code.claude.com/docs/en/overview" target="_blank" data-ua="Офіційна документація Claude Code" data-en="Official Claude Code Documentation">Офіційна документація Claude Code</a>
+        <span class="link-desc">code.claude.com</span>
+      </li>
+      <li>
+        <span class="link-icon">&#127891;</span>
+        <a href="https://anthropic.skilljar.com" target="_blank" data-ua="Безкоштовні курси від Anthropic" data-en="Free Courses from Anthropic">Безкоштовні курси від Anthropic</a>
+        <span class="link-desc">anthropic.skilljar.com</span>
+      </li>
+      <li>
+        <span class="link-icon">&#128722;</span>
+        <a href="https://claudemarketplaces.com" target="_blank" data-ua="Каталог скілів" data-en="Skills Catalog">Каталог скілів</a>
+        <span class="link-desc">claudemarketplaces.com</span>
+      </li>
+      <li>
+        <span class="link-icon">&#128187;</span>
+        <a href="https://github.com/mattpocock/skills" target="_blank" data-ua="GitHub скіли від mattpocock" data-en="GitHub Skills by mattpocock">GitHub скіли від mattpocock</a>
+        <span class="link-desc">github.com/mattpocock/skills</span>
+      </li>
+      <li>
+        <span class="link-icon">&#127760;</span>
+        <a href="https://github.com/ComposioHQ/awesome-claude-skills" target="_blank" data-ua="Каталог скілів від спільноти" data-en="Community Skills Catalog">Каталог скілів від спільноти</a>
+        <span class="link-desc">github.com/ComposioHQ/awesome-claude-skills</span>
+      </li>
+      <li>
+        <span class="link-icon">&#128194;</span>
+        <a href="https://drive.google.com/drive/folders/1WV5FZL5Z3njNLpDpoge7TVw_LdjAS3T4?usp=sharing" target="_blank" data-ua="Мої скіли і приклад CLAUDE.md" data-en="My skills and CLAUDE.md example">Мої скіли і приклад CLAUDE.md</a>
+        <span class="link-desc">Google Drive</span>
+      </li>
+    </ul>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span data-ua="Курс від Olha L. — 2025" data-en="Course by Olha L. — 2025">Курс від Olha L. — 2025</span>
+</footer>
+
+<!-- BACK TO TOP -->
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">&#8593;</button>
+
+<script>
+  let currentLang = 'ua';
+
+  function setLang(lang) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.trim().toLowerCase() === lang);
+    });
+    document.documentElement.lang = lang === 'ua' ? 'uk' : 'en';
+    document.querySelectorAll('[data-ua][data-en]').forEach(el => {
+      const text = el.getAttribute('data-' + lang);
+      if (text !== null) {
+        if (el.childElementCount === 0) {
+          el.textContent = text;
+        } else {
+          el.innerHTML = text;
+        }
+      }
+    });
+  }
+
+  // Copy code to clipboard
+  function copyCode(btn) {
+    const block = btn.closest('.code-block');
+    const clone = block.cloneNode(true);
+    // Remove the copy button and label from the clone
+    const copyBtn = clone.querySelector('.code-copy');
+    const label = clone.querySelector('.code-label');
+    if (copyBtn) copyBtn.remove();
+    if (label) label.remove();
+    const text = clone.textContent.trim();
+    navigator.clipboard.writeText(text).then(() => {
+      btn.innerHTML = '&#10003; Copied';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.innerHTML = '&#9112; Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // Reading progress bar
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    document.getElementById('progressBar').style.width = progress + '%';
+  }
+
+  // Back to top visibility
+  function updateBackToTop() {
+    const btn = document.getElementById('backToTop');
+    if (window.scrollY > 400) {
+      btn.classList.add('show');
+    } else {
+      btn.classList.remove('show');
+    }
+  }
+
+  // Fade-in sections on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.section').forEach(section => {
+    observer.observe(section);
+  });
+
+  // Active TOC link highlighting
+  function updateActiveTocLink() {
+    const sections = document.querySelectorAll('.section[id]');
+    let current = '';
+    sections.forEach(section => {
+      const top = section.getBoundingClientRect().top;
+      if (top < 120) current = section.id;
+    });
+    document.querySelectorAll('.toc-list a').forEach(a => {
+      a.classList.toggle('active-link', a.getAttribute('href') === '#' + current);
+    });
+  }
+
+  // Scroll events
+  window.addEventListener('scroll', () => {
+    updateProgress();
+    updateBackToTop();
+    updateActiveTocLink();
+  }, { passive: true });
+
+  // Smooth scrolling for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Init
+  updateProgress();
+</script>
+
+</body>
+</html>
